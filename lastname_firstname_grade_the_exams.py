@@ -179,22 +179,23 @@ try:
             file_lines.append(line.rstrip())
 except FileNotFoundError:
     print('File cannot be found.')
+    quit()
 else:
     print(f'Successfully opened {filename}')
 
-    # Task 2
-    valid_lines = record_valid_check(file_lines)
+# Task 2
+valid_lines = record_valid_check(file_lines)
 
-    # Task 3
-    answer_key = "B,A,D,D,C,B,D,A,C,C,D,B,A,B,A,C,B,D,A,C,A,A,B,D,D"
-    id_grade_list = grade_and_stats(valid_lines, answer_key)
+# Task 3
+answer_key = "B,A,D,D,C,B,D,A,C,C,D,B,A,B,A,C,B,D,A,C,A,A,B,D,D"
+id_grade_list = grade_and_stats(valid_lines, answer_key)
 
-    # Task 4: Lưu kết quả vào tập tin
-    grades_file = filename[:-4] + '_grades.txt'
-    with open(grades_file, 'w') as write_file:
-        for line in id_grade_list:
-            write_file.write(line + '\n')
-    # print(f'Grades saved in {grades_file}')
+# Task 4: Lưu kết quả vào tập tin
+grades_file = filename[:-4] + '_grades.txt'
+with open(grades_file, 'w') as write_file:
+    for line in id_grade_list:
+        write_file.write(line + '\n')
+# print(f'Grades saved in {grades_file}')
 
 
 
