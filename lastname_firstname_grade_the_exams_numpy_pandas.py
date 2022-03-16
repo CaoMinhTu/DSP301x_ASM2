@@ -94,8 +94,16 @@ valid_lines = record_valid_check(file_lines)
 
 # Task 3
 answer_key = "B,A,D,D,C,B,D,A,C,C,D,B,A,B,A,C,B,D,A,C,A,A,B,D,D"
+answer_key = answer_key.split(',')
 num_questions = 25
 
 class_valid_lines = pd.DataFrame(valid_lines)
+print('before transform:')
 print(class_valid_lines)
-print(class_valid_lines.shape)
+
+# chấm điểm từng câu trả lời theo answer_key
+for index, key in enumerate(answer_key):
+    class_valid_lines[index + 1] = class_valid_lines[index + 1].apply(lambda answer: 0 if not answer else 4 if answer == key else -1)
+
+print('after transform:')
+print(class_valid_lines)
