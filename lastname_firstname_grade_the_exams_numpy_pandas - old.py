@@ -62,6 +62,8 @@ def record_valid_check(file_lines):
 # - các dòng thiếu câu trả lời do pandas đã làm đầy bằng giá trị NaN
 # - các dòng thừa câu trả lời nếu các giá trị từ cột 26 trở đi là giá trị NaN (thí sinh bỏ qua các câu này)
 filename = input('Enter a class file to grade (i.e. class1 or class1.txt):')
+if not filename:
+    filename = 'class1.txt'
 if not '.txt' in filename:
     filename += '.txt'
 
@@ -98,65 +100,25 @@ answer_key = answer_key.split(',')
 num_questions = 25
 
 class_valid_lines = pd.DataFrame(valid_lines)
-class_valid_lines = class_valid_lines.rename(columns={0: 'id'})
+print('before transform:')
+print(class_valid_lines)
 
 # chấm điểm từng câu trả lời theo answer_key
 for index, key in enumerate(answer_key):
     class_valid_lines[index + 1] = class_valid_lines[index + 1].apply(lambda answer: 0 if not answer else 4 if answer == key else -1)
 
-col_list = list(class_valid_lines)
-col_list.remove('id')
+class_valid_lines['sum'] = class_valid_lines.sum(axis=1)
 
-# tính tổng điểm cho từng học sinh
-class_valid_lines['sum'] = class_valid_lines[col_list].sum(axis=1)
+print('after transform:')
+print(class_valid_lines)
 
-# 3.1. Đếm số lượng học sinh đạt điểm cao (>80).
-num_high_score_students = sum(class_valid_lines['sum'] > 80)
-print(f'Total student of high scores: {num_high_score_students}')
+sum_student = class_valid_lines.loc[0, 'sum']
 
-# 3.2. Điểm trung bình.
-mean_grade = class_valid_lines['sum'].mean()
-print(f'Mean (average) score: {mean_grade}')
+print(sum_student)
 
-# 3.3. Điểm cao nhất.
-max_grade = class_valid_lines['sum'].max()
-print(f'Highest score: {max_grade}')
+# đếm số câu đúng ứng với từng câu hỏi
+for i in range(1, 26):
+    class_valid_lines[i] = class_valid_lines[i].apply(lambda grade: pd.NA if grade != 4 else grade)
 
-# 3.4. Điểm thấp nhất.
-min_grade = class_valid_lines['sum'].min()
-print(f'Lowest score: {min_grade}')
+print(type(class_valid_lines.count()))
 
-# 3.5. Miền giá trị của điểm (cao nhất trừ thấp nhất).
-print(f'Range of scores: {max_grade - min_grade}')
-
-# 3.6. Giá trị trung vị
-median_grade = class_valid_lines['sum'].median()
-print(f'Median score: {median_grade}')
-
-# 3.7. Trả về các câu hỏi bị học sinh bỏ qua nhiều nhất theo thứ tự: số thứ tự câu hỏi - số lượng học sinh bỏ qua -  tỉ lệ bị bỏ qua (nếu có cùng số lượng cho nhiều câu hỏi bị bỏ thì phải liệt kê ra đầy đủ).
-num_right = class_valid_lines[class_valid_lines == 4].count()
-num_wrong = class_valid_lines[class_valid_lines == -1].count()
-num_skipped = class_valid_lines[class_valid_lines == 0].count()
-num_students = class_valid_lines.shape[0]
-
-max_skipped = num_skipped.max()
-skipped_str = 'Question that most people skip:'
-for col in col_list:
-    if num_skipped[col] == max_skipped:
-        skipped_str += f' {col} - {max_skipped} - {(max_skipped / num_students):.3f} ,'
-skipped_str = skipped_str[:-2]
-print(skipped_str)
-
-max_wrong = num_wrong.max()
-wrong_str = 'Question that most people answer incorrectly:'
-for col in col_list:
-    if num_wrong[col] == max_wrong:
-        wrong_str += f' {col} - {max_wrong} - {(max_wrong / (max_wrong + num_right[col])):.3f} ,'
-wrong_str = wrong_str[:-2]
-print(wrong_str)
-
-# Task 4: lưu danh sách điểm học sinh
-sum_student = class_valid_lines[['id', 'sum']]
-filename = filename[:-4] + '_grades.txt'
-sum_student.to_csv(filename, header=False, index=False)
-# print(f'Grades saved in {grades_file}')

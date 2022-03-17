@@ -196,6 +196,3 @@ with open(grades_file, 'w') as write_file:
     for line in id_grade_list:
         write_file.write(line + '\n')
 # print(f'Grades saved in {grades_file}')
-
-
-
