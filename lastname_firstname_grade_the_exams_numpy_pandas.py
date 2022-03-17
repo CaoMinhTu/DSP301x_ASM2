@@ -62,6 +62,8 @@ def record_valid_check(file_lines):
 # - các dòng thiếu câu trả lời do pandas đã làm đầy bằng giá trị NaN
 # - các dòng thừa câu trả lời nếu các giá trị từ cột 26 trở đi là giá trị NaN (thí sinh bỏ qua các câu này)
 filename = input('Enter a class file to grade (i.e. class1 or class1.txt):')
+if not filename:
+    filename = 'class1.txt'
 if not '.txt' in filename:
     filename += '.txt'
 
@@ -105,5 +107,18 @@ print(class_valid_lines)
 for index, key in enumerate(answer_key):
     class_valid_lines[index + 1] = class_valid_lines[index + 1].apply(lambda answer: 0 if not answer else 4 if answer == key else -1)
 
+class_valid_lines['sum'] = class_valid_lines.sum(axis=1)
+
 print('after transform:')
 print(class_valid_lines)
+
+sum_student = class_valid_lines.loc[0, 'sum']
+
+print(sum_student)
+
+# đếm số câu đúng ứng với từng câu hỏi
+for i in range(1, 26):
+    class_valid_lines[i] = class_valid_lines[i].apply(lambda grade: pd.NA if grade != 4 else grade)
+
+print(type(class_valid_lines.count()))
+
